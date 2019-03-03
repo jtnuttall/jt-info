@@ -9,7 +9,14 @@ import Import
 
 getProfileR :: Handler Html
 getProfileR = do
-    (_, user) <- requireAuthPair
+    (_, eitherUser) <- requireAuthPair
+
     defaultLayout $ do
-        setTitle . toHtml $ userIdent user <> "'s User page"
+        let username = 
+                case eitherUser of
+                    Left user     -> userIdent user
+                    Right manager -> managerName manager <> " (manager)"
+              
+        setTitle . toHtml $ username <> "'s User page"
+        
         $(widgetFile "profile")

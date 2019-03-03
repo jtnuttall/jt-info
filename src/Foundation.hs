@@ -7,6 +7,9 @@
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module Foundation where
 
@@ -20,12 +23,15 @@ import Control.Monad.Logger (LogSource)
 --import Yesod.Auth.Dummy
 
 import Yesod.Auth.Hardcoded
+import Yesod.Auth.Message (AuthMessage(..))
 --import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
+import Text.Read (readMaybe)
+import Settings.SiteManagers
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -233,9 +239,13 @@ instance YesodPersistRunner App where
     getDBRunner :: Handler (DBRunner App, Handler ())
     getDBRunner = defaultGetDBRunner appConnPool
 
+instance PathPiece (Either UserId Text) where
+    fromPathPiece = readMaybe . unpack
+    toPathPiece = pack . show
+
 instance YesodAuth App where
-    --type AuthId App = UserId
     type AuthId App = Either UserId Text
+    --type AuthId App = UserId
 
     -- Where to send a user after successful login
     loginDest :: App -> Route App
@@ -249,7 +259,16 @@ instance YesodAuth App where
 
     authenticate :: (MonadHandler m, HandlerSite m ~ App)
                  => Creds App -> m (AuthenticationResult App)
-    authenticate creds = liftHandler $ runDB $ do
+    
+    authenticate Creds{..} =
+      return
+        (case credsPlugin of
+          "hardcoded" ->
+            case lookupUser credsIdent of
+              Nothing -> UserError InvalidLogin
+              Just m  -> Authenticated (Right (managerName m)))
+    {-
+     authenticate creds = liftHandler $ runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Authenticated uid
@@ -257,10 +276,12 @@ instance YesodAuth App where
                 { userIdent = credsIdent creds
                 , userPassword = Nothing
                 }
+    -}
 
     -- You can add other plugins like Google Email, email or OAuth here
     authPlugins :: App -> [AuthPlugin App]
-    authPlugins app = [authOpenId Claimed []] -- ++ extraAuthPlugins
+    authPlugins app = [authHardcoded]
+        -- [authOpenId Claimed []] -- ++ extraAuthPlugins
         -- Enable authDummy login if enabled.
         --where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
@@ -272,7 +293,17 @@ isAuthenticated = do
         Nothing -> Unauthorized "You must login to access this page"
         Just _ -> Authorized
 
-instance YesodAuthPersist App
+instance YesodAuthPersist App where
+  type AuthEntity App = Either User SiteManager
+
+  getAuthEntity (Left uid) = do 
+      x <- liftHandler . runDB $ get uid
+      return (Left <$> x)
+  getAuthEntity (Right username) = return (Right <$> lookupUser username)
+
+instance YesodAuthHardcoded App where
+  validatePassword u = return . validPassword u
+  doesUserNameExist  = return . isJust . lookupUser
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
