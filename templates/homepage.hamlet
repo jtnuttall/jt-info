@@ -2,15 +2,22 @@
     <div .container>
         <div .row>
             <h1 .header>
-                Yesod—a modern framework for blazing fast websites
+                James Thomas
             <h2>
-                Fast, stable & spiced with great community
-            <a href="http://www.yesodweb.com/book/" .btn.btn-info.btn-lg>
-                Read the Book
+               Bodybuilder, writer, speaker, activist
 
 <div .container>
+    <div .bs-docs-section>
+        <div .row>
+            <div .page-header>
+                <h1 #start>Recent Posts:
+
+        $forall entry <- pageItems $ pagesCurrent page
+            ^{entry}
+
+
+
     <!-- Starting
-        ================================================== -->
     <div .bs-docs-section>
         <div .row>
             <div .col-lg-12>
@@ -56,7 +63,6 @@
     <hr>
 
     <!-- Forms
-        ================================================== -->
     <div .bs-docs-section>
         <div .row>
             <div .col-lg-12>
@@ -88,46 +94,7 @@
                         File upload result will be here...
 
 
-    <hr>
-
-    <!-- JSON
-        ================================================== -->
-    <div .bs-docs-section>
-        <div .row>
-            <div .col-lg-12>
-                <div .page-header>
-                    <h1 #json>JSON
-
-                    <p>
-                        Yesod has JSON support baked-in.
-                        The form below makes an AJAX request with Javascript,
-                        then updates the page with your submission.
-                        (see <tt>Handler/Comment.hs</tt>, <tt>templates/homepage.julius</tt>,
-                        and <tt>Handler/Home.hs</tt> for the implementation).
-
-        <div .row>
-            <div .col-lg-6>
-                <div .bs-callout.bs-callout-info.well>
-                    <form .form-horizontal ##{commentFormId}>
-                        <div .field>
-                            <textarea rows="2" ##{commentTextareaId} placeholder="Your comment here..." required></textarea>
-
-                        <button .btn.btn-primary type=submit>
-                           Create comment
-
-           <div .col-lg-4.col-lg-offset-1>
-               <div .bs-callout.bs-callout-info>
-                   <small>
-                       Your comments will appear here. You can also open the
-                       console log to see the raw response from the server.
-                   <ul ##{commentListId}>
-                       $forall comment <- allComments
-                           <li>#{commentMessage $ entityVal comment}
-
-    <hr>
-
     <!-- Testing
-       ================================================== -->
     <div .bs-docs-section>
        <div .row>
            <div .col-lg-12>
@@ -139,3 +106,4 @@
                        test suite that performs tests on this page.
                    <p>
                        You can run your tests by doing: <code>stack test</code>
+    -->

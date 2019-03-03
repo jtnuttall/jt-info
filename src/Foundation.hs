@@ -31,7 +31,6 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 import Text.Read (readMaybe)
-import Settings.SiteManagers
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -128,6 +127,11 @@ instance Yesod App where
                     , menuItemAccessCallback = isJust muser
                     }
                 , NavbarRight $ MenuItem
+                    { menuItemLabel = "New Post!"
+                    , menuItemRoute = NewEntryR
+                    , menuItemAccessCallback = isJust muser
+                    }
+                , NavbarRight $ MenuItem
                     { menuItemLabel = "Login"
                     , menuItemRoute = AuthR LoginR
                     , menuItemAccessCallback = isNothing muser
@@ -153,6 +157,10 @@ instance Yesod App where
 
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR css_bootstrap_css
+            addStylesheet $ StaticR quill_quill_snow_css
+            addScript $ StaticR quill_quill_min_js
+            addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js"
+            addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -168,15 +176,18 @@ instance Yesod App where
         -> Handler AuthResult
     -- Routes not requiring authentication.
     isAuthorized (AuthR _) _ = return Authorized
-    isAuthorized CommentR _ = return Authorized
     isAuthorized HomeR _ = return Authorized
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
+    isAuthorized (EntryR _) _ = return Authorized
 
     -- the profile route requires that the user is authenticated, so we
     -- delegate to that function
     isAuthorized ProfileR _ = isAuthenticated
+    isAuthorized (EditEntryR _) _ = isAuthenticated
+    isAuthorized (DeleteEntryR _) _ = isAuthenticated
+    isAuthorized NewEntryR _ = isAuthenticated
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -266,7 +277,9 @@ instance YesodAuth App where
           "hardcoded" ->
             case lookupUser credsIdent of
               Nothing -> UserError InvalidLogin
-              Just m  -> Authenticated (Right (managerName m)))
+              Just m  -> Authenticated (Right (managerName m))
+          _ -> UserError InvalidLogin
+          )
     {-
      authenticate creds = liftHandler $ runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds

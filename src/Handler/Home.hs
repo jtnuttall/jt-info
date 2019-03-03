@@ -3,11 +3,16 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
 module Handler.Home where
 
 import Import
 import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
-import Text.Julius (RawJS (..))
+import Yesod.Paginator
+import Text.Blaze.Html
+import Data.Time.Clock
+import Data.Time.Format
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -15,6 +20,23 @@ data FileForm = FileForm
     , fileDescription :: Text
     }
 
+--construct a widget from an entry entity
+--entrycontents are raw html...usually dangerous but this is only going
+--to come from my account. it is not user-generated 
+getEntryWidget :: Entity Entry -> WidgetFor App () 
+getEntryWidget entity =
+    let entryId = entityKey entity
+        Entry{..} = entityVal entity
+    in toWidget 
+          [hamlet|
+              <div .row>
+                  <h2>
+                      <a href="@{EntryR entryId}">
+                          #{entryTitle}
+              <div .row>#{preEscapedToHtml entryContents}
+              <div .float-right>#{formatTime defaultTimeLocale "%R — %u, %B %Y" entryPosted}
+              <hr>
+          |]
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
 -- config/routes
@@ -27,12 +49,14 @@ getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
     let submission = Nothing :: Maybe FileForm
         handlerName = "getHomeR" :: Text
-    allComments <- runDB $ getAllComments
+
+    entries <- runDB $ selectList [] [Asc EntryId]
+    let entries' = map getEntryWidget entries
+    page <- paginate 10 entries'
 
     defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
         aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
+        setTitle "James Thomas"
         $(widgetFile "homepage")
 
 postHomeR :: Handler Html
@@ -42,12 +66,14 @@ postHomeR = do
         submission = case result of
             FormSuccess res -> Just res
             _ -> Nothing
-    allComments <- runDB $ getAllComments
+
+    entries <- runDB $ selectList [] [Asc EntryId]
+    let entries' = map getEntryWidget entries
+    page <- paginate 10 entries'
 
     defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
         aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
+        setTitle "James Thomas"
         $(widgetFile "homepage")
 
 sampleForm :: Form FileForm
@@ -65,9 +91,3 @@ sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
                 , ("placeholder", "File description")
                 ]
             }
-
-commentIds :: (Text, Text, Text)
-commentIds = ("js-commentForm", "js-createCommentTextarea", "js-commentList")
-
-getAllComments :: DB [Entity Comment]
-getAllComments = selectList [] [Asc CommentId]

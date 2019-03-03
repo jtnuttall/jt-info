@@ -9,6 +9,8 @@
 
 / HomeR GET POST
 
-/comments CommentR POST
-
 /profile ProfileR GET
+/entry/#EntryId EntryR GET
+/entry/#EntryId/edit EditEntryR GET POST
+/entry/#EntryId/delete DeleteEntryR GET POST
+/new NewEntryR GET POST
