@@ -1,0 +1,17 @@
+<h1>About
+<h2>About me
+<p>I'm James Thomas — born Jeremy Taylor Nuttall. This is my personal site 
+    for writing and self-promotion. I'm a graduate of USC with a computer 
+    science degree and a knack for writing and speaking.
+
+<p>Please see my <a href="@{ResumeR}">resume</a>!
+
+<h2>About the site
+<p>This site was written and scaffolded in Yesod, a Haskell web framework! 
+    Prospective employers are welcome to request the source for the website,
+    which I maintain in a private git repository.
+
+<p>In future, I will expand a bit on the project's architecture and internal 
+    workings. Yesod has facilitated relatively small amounts of code. Every 
+    page is written in one of its templating languages, permittinng quick 
+    and lightweight development.

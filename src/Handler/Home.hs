@@ -25,18 +25,10 @@ data FileForm = FileForm
 --to come from my account. it is not user-generated 
 getEntryWidget :: Entity Entry -> WidgetFor App () 
 getEntryWidget entity =
-    let entryId = entityKey entity
+    let maybeEntryId = Just $ entityKey entity
         Entry{..} = entityVal entity
-    in toWidget 
-          [hamlet|
-              <div .row>
-                  <h2>
-                      <a href="@{EntryR entryId}">
-                          #{entryTitle}
-              <div .row>#{preEscapedToHtml entryContents}
-              <div .float-right>#{formatTime defaultTimeLocale "%R — %u, %B %Y" entryPosted}
-              <hr>
-          |]
+    in $(widgetFile "entry/entry")
+
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
 -- config/routes

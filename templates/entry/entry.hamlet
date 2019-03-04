@@ -1,0 +1,10 @@
+<div .row>
+    <h2>
+        $maybe entryId <- maybeEntryId
+            <a href="@{EntryR entryId}">
+                #{entryTitle}
+        $nothing
+            #{entryTitle}
+<div .row>#{preEscapedToHtml entryContents}
+<div .float-right>#{formatTime defaultTimeLocale "%R — %u, %B %Y" entryPosted}
+<hr>

@@ -14,3 +14,5 @@
 /entry/#EntryId/edit EditEntryR GET POST
 /entry/#EntryId/delete DeleteEntryR GET POST
 /new NewEntryR GET POST
+/about AboutR GET
+/resume ResumeR GET
