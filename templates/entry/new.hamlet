@@ -1,6 +1,8 @@
 <h1>New Post!
 
 <div ##{entryStatusId}>
+$maybe key <- maybeKey
+    <a href=@{EntryR key}>Post is here!
 
 <form .form-horizontal ##{entryFormId} method=post action=@{NewEntryR} enctype=#{enctype}>
     ^{editorWidget}

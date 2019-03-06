@@ -1,11 +1,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 module Handler.NewEntry where
 
 import Import
 import Text.Julius (RawJS(..))
 import Yesod.Form.Bootstrap3
 import Plugins.Summernote
+import Data.Time.Clock (getCurrentTime)
 
 data EntryForm = EntryForm
     { title :: Text
@@ -26,7 +28,7 @@ pageIds =
 
 getNewEntryR :: Handler Html
 getNewEntryR = do
-    let placeholder = "contents..." :: Text
+    let maybeKey = Nothing
 
     (editorWidget, enctype) <- generateFormPost entryForm
 
@@ -47,7 +49,14 @@ getNewEntryR = do
 
 postNewEntryR :: Handler Html
 postNewEntryR = do
-    ((res, editorWidget), enctype) <- runFormPost entryForm
+    ((result, editorWidget), enctype) <- runFormPost entryForm
+
+    maybeKey <- case result of
+        FormSuccess (EntryForm{..}) -> do
+            time <- liftIO getCurrentTime
+            key  <- runDB $ insert $ Entry title contents time
+            return $ Just key
+        _ -> return $ Nothing
 
     defaultLayout $ do
         setTitle "New Blog Entry -- Posted!"
