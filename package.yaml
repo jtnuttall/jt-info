@@ -48,6 +48,7 @@ dependencies:
 - foreign-store
 - yesod-paginator >=1.1 && <1.2
 - blaze-html
+- xss-sanitize
 
 # The library contains all of our application code. The executable
 # defined below is just a thin wrapper.

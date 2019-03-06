@@ -31,6 +31,7 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 import Text.Read (readMaybe)
+import Plugins.Summernote
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -163,9 +164,9 @@ instance Yesod App where
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR css_bootstrap_css
             addStylesheet $ StaticR quill_quill_snow_css
-            addScript $ StaticR quill_quill_min_js
-            addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js"
-            addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"
+            --addScript $ StaticR quill_quill_min_js
+            --addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js"
+            --addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -328,6 +329,9 @@ instance YesodAuthPersist App where
 instance YesodAuthHardcoded App where
   validatePassword u = return . validPassword u
   doesUserNameExist  = return . isJust . lookupUser
+
+instance YesodSummernote App where
+  summernoteLoadLibrariesAndCss _ = True
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.

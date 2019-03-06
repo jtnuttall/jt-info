@@ -6,5 +6,5 @@
         $nothing
             #{entryTitle}
 <div .row>#{preEscapedToHtml entryContents}
-<div .float-right>#{formatTime defaultTimeLocale "%R — %u, %B %Y" entryPosted}
+<div .float-right>#{formatTime defaultTimeLocale "%R — %A, %B %Y" entryPosted}
 <hr>

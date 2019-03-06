@@ -42,7 +42,7 @@ getHomeR = do
     let submission = Nothing :: Maybe FileForm
         handlerName = "getHomeR" :: Text
 
-    entries <- runDB $ selectList [] [Asc EntryId]
+    entries <- runDB $ selectList [] [Desc EntryId]
     let entries' = map getEntryWidget entries
     page <- paginate 10 entries'
 
