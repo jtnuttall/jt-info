@@ -3,7 +3,7 @@
 
 User
     ident Text sqltype=varchar(255)
-    password Text Maybe sqltype=varchar(255) default=NULL
+    password Text sqltype=varchar(255)
     UniqueUser ident
     deriving Typeable
 Email
@@ -12,11 +12,10 @@ Email
     verkey Text Maybe sqltype=varchar(255) default=NULL
     UniqueEmail email
     deriving Show
-Entry json
+Entry
     title Text sqltype=varchar(255)
-    contents Text sqltype=longtext
+    contents Html sqltype=longtext
     posted UTCTime
-    deriving Show
 Comment json
     entry EntryId
     posted UTCTime

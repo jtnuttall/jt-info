@@ -25,8 +25,9 @@ data FileForm = FileForm
 --to come from my account. it is not user-generated 
 getEntryWidget :: Entity Entry -> WidgetFor App () 
 getEntryWidget entity =
-    let maybeEntryId = Just $ entityKey entity
-        Entry{..} = entityVal entity
+    let linkToEntry = True
+        entryId     = entityKey entity
+        Entry{..}   = entityVal entity
     in $(widgetFile "entry/entry")
 
 -- This is a handler function for the GET request method on the HomeR

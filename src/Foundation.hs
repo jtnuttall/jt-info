@@ -23,6 +23,7 @@ import Control.Monad.Logger (LogSource)
 --import Yesod.Auth.Dummy
 
 import Yesod.Auth.Hardcoded
+import Yesod.Auth.Email
 import Yesod.Auth.Message (AuthMessage(..))
 --import Yesod.Auth.OpenId    (authOpenId, IdentifierType (Claimed))
 import Yesod.Default.Util   (addStaticContentExternal)
@@ -163,10 +164,6 @@ instance Yesod App where
 
         pc <- widgetToPageContent $ do
             addStylesheet $ StaticR css_bootstrap_css
-            addStylesheet $ StaticR quill_quill_snow_css
-            --addScript $ StaticR quill_quill_min_js
-            --addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js"
-            --addScriptRemote "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"
             $(widgetFile "default-layout")
         withUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -283,15 +280,15 @@ instance YesodAuth App where
     authenticate :: (MonadHandler m, HandlerSite m ~ App)
                  => Creds App -> m (AuthenticationResult App)
     
-    authenticate Creds{..} =
-      return
-        (case credsPlugin of
+    authenticate creds@Creds{..} =
+      return $
+        case credsPlugin of
           "hardcoded" ->
             case lookupUser credsIdent of
               Nothing -> UserError InvalidLogin
               Just m  -> Authenticated (Right (managerName m))
           _ -> UserError InvalidLogin
-          )
+          
     {-
      authenticate creds = liftHandler $ runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds
@@ -331,6 +328,9 @@ instance YesodAuthHardcoded App where
   doesUserNameExist  = return . isJust . lookupUser
 
 instance YesodSummernote App where
+  urlBootstrapCss _ = Nothing
+  urlBootstrapScript _ = Nothing
+  urlJQueryScript _ = Nothing
   summernoteLoadLibrariesAndCss _ = True
 
 -- This instance is required to use forms. You can modify renderMessage to

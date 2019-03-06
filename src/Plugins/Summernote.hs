@@ -10,6 +10,8 @@
 -- summerForm = renderBootstrap3 BootstrapBasicForm $ HtmlComment
 --   \<$\> areq (snHtmlFieldCustomized "{toolbar:false}") \"Title\" Nothing
 --   \<*\> areq snHtmlField \"Comment\" Nothing
+--
+-- Edited for Yesod 1.6 by Jeremy Nuttall
 -- @
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE QuasiQuotes #-}
@@ -34,24 +36,24 @@ import           Yesod.Form
 
 class Yesod a => YesodSummernote a where
     -- | Bootstrap 3 CSS location.
-    urlBootstrapCss :: a -> Either (Route a) Text
-    urlBootstrapCss _ =
-        Right "http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css"
+    urlBootstrapCss :: a -> Maybe (Either (Route a) Text)
+    urlBootstrapCss _ = Just $ Right
+        "http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css"
     -- | Bootstrap 3 library location.
-    urlBootstrapScript :: a -> Either (Route a) Text
-    urlBootstrapScript _ =
-        Right "http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"
+    urlBootstrapScript :: a -> Maybe (Either (Route a) Text)
+    urlBootstrapScript _ = Just $ Right
+        "http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"
     -- | JQuery library location.
-    urlJQueryScript :: a -> Either (Route a) Text
-    urlJQueryScript _ =
-        Right "http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"
+    urlJQueryScript :: a -> Maybe (Either (Route a) Text)
+    urlJQueryScript _ = Just $ Right
+        "http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"
     -- | Summernote Editor CSS location.
-    urlSummernoteCss :: a -> Either (Route a) Text
-    urlSummernoteCss _ = Right
+    urlSummernoteCss :: a -> Maybe (Either (Route a) Text)
+    urlSummernoteCss _ = Just $ Right
         "http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.css"
     -- | Summernote Editor library location.
-    urlSummernoteScript :: a -> Either (Route a) Text
-    urlSummernoteScript _ = Right
+    urlSummernoteScript :: a -> Maybe (Either (Route a) Text)
+    urlSummernoteScript _ = Just $ Right
         "http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote.js"
     -- | Should required libraries and scripts be added in DOM tree?  This
     -- property required to control script loading.  In case if you load JQuery,
@@ -111,15 +113,21 @@ snHtmlField :: YesodSummernote site
 snHtmlField = snHtmlFieldCustomized ""
 
 addScript' :: (MonadWidget m, HandlerSite m ~ site)
-           => (site -> Either (Route site) Text)
+           => (site -> Maybe (Either (Route site) Text))
            -> m ()
 addScript' f = do
     y <- getYesod
-    addScriptEither $ f y
+
+    case f y of
+        Just z  -> addScriptEither z
+        Nothing -> return ()
 
 addStylesheet' :: (MonadWidget m, HandlerSite m ~ site)
-               => (site -> Either (Route site) Text)
+               => (site -> Maybe (Either (Route site) Text))
                -> m ()
 addStylesheet' f = do
     y <- getYesod
-    addStylesheetEither $ f y
+
+    case f y of
+        Just z  -> addStylesheetEither z
+        Nothing -> return ()

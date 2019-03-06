@@ -1,9 +1,9 @@
 <div .row>
     <h2>
-        $maybe entryId <- maybeEntryId
+        $if linkToEntry
             <a href="@{EntryR entryId}">
                 #{entryTitle}
-        $nothing
+        $else
             #{entryTitle}
 <div .row>#{preEscapedToHtml entryContents}
 <div .float-right>#{formatTime defaultTimeLocale "%R — %A, %B %Y" entryPosted}
