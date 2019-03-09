@@ -13,6 +13,7 @@ getEntryR entryId = do
     Entry{..} <- runDB $ get404 entryId
 
     let linkToEntry = False
+    loggedIn <- isJust <$> maybeAuthPair
     
     defaultLayout $ do
         setTitle $ toHtml $ entryTitle <> " — James Thomas' Blog"

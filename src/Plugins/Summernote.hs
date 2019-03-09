@@ -85,15 +85,16 @@ snHtmlFieldCustomized cfg = Field
                     $newline never
                     <textarea id="#{theId}" *{attrs} name="#{name}" .html>#{showVal val}
                   |]
+
         master <- getYesod
-        liftIO $ putStrLn "beeeeefooooooreeeeee:"
+
         (when (summernoteLoadLibrariesAndCss master) $ do
-            liftIO $ putStrLn       "add"
             addScript'     urlJQueryScript
             addStylesheet' urlBootstrapCss
             addScript'     urlBootstrapScript
             addStylesheet' urlSummernoteCss
-            addScript'     urlSummernoteScript)
+            addScript'     urlSummernoteScript
+            )
         toWidget $ [julius|
             $(document).ready(function(){
               var input = document.getElementById("#{rawJS theId}");

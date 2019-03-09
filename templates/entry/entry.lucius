@@ -1,0 +1,15 @@
+.entry {
+  background-color: #e8e8e8;
+
+  padding-left: 20px;
+  padding-right: 20px;
+  /*padding-top: 10px;*/
+  padding-bottom: 10px;
+
+  border-radius: 20px;
+}
+
+.post-ruler {
+  border: 2.5px solid darkgrey;
+  border-radius: 2.5px;
+}

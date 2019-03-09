@@ -1,0 +1,11 @@
+<h1>#{pageTitle}
+
+<div ##{entryStatusId}>
+$maybe key <- maybeKey
+    <div .alert .alert-success>
+        <a .link-success href=@{EntryR key}>Post #{show $ fromSqlKey $ key} is here!
+
+<form .form-horizontal ##{entryFormId} method=post action=@{postRoute} enctype=#{enctype}>
+    ^{editorWidget}
+
+    <button .btn.btn-primary type="submit">Save!

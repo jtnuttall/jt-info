@@ -13,18 +13,13 @@ import Yesod.Paginator
 import Text.Blaze.Html
 import Data.Time.Clock
 import Data.Time.Format
-
--- Define our data that will be used for creating the form.
-data FileForm = FileForm
-    { fileInfo :: FileInfo
-    , fileDescription :: Text
-    }
+import Data.Maybe (isJust)
 
 --construct a widget from an entry entity
 --entrycontents are raw html...usually dangerous but this is only going
 --to come from my account. it is not user-generated 
-getEntryWidget :: Entity Entry -> WidgetFor App () 
-getEntryWidget entity =
+getEntryWidget :: Bool -> Entity Entry -> WidgetFor App () 
+getEntryWidget loggedIn entity =
     let linkToEntry = True
         entryId     = entityKey entity
         Entry{..}   = entityVal entity
@@ -39,48 +34,13 @@ getEntryWidget entity =
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe FileForm
-        handlerName = "getHomeR" :: Text
-
     entries <- runDB $ selectList [] [Desc EntryId]
-    let entries' = map getEntryWidget entries
-    page <- paginate 10 entries'
+    loggedIn <- isJust <$> maybeAuthPair :: Handler Bool
+    let entries' = map (getEntryWidget loggedIn) entries
+    pages <- paginate 3 entries'
 
     defaultLayout $ do
         aDomId <- newIdent
         setTitle "James Thomas"
         $(widgetFile "homepage")
 
-postHomeR :: Handler Html
-postHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
-        submission = case result of
-            FormSuccess res -> Just res
-            _ -> Nothing
-
-    entries <- runDB $ selectList [] [Asc EntryId]
-    let entries' = map getEntryWidget entries
-    page <- paginate 10 entries'
-
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "James Thomas"
-        $(widgetFile "homepage")
-
-sampleForm :: Form FileForm
-sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
-    <$> fileAFormReq "Choose a file"
-    <*> areq textField textSettings Nothing
-    -- Add attributes like the placeholder and CSS classes.
-    where textSettings = FieldSettings
-            { fsLabel = "What's on the file?"
-            , fsTooltip = Nothing
-            , fsId = Nothing
-            , fsName = Nothing
-            , fsAttrs =
-                [ ("class", "form-control")
-                , ("placeholder", "File description")
-                ]
-            }

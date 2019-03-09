@@ -40,6 +40,8 @@ packages:
 extra-deps:
 - yesod-paginator-1.1.0.1
 - xss-sanitize-0.3.6
+- http-reverse-proxy-0.4.5@sha256:7f2a181ec848e8fdc0bdb4d6e775e488897957ee7ae0a2b82a623360168ccf96
+- unix-compat-0.4.3.1@sha256:a291f209e9c9723204c49c978ed2c53997dbc9666e53fe7bf7a3548b2c8bb22c
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

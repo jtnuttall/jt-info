@@ -1,8 +1,0 @@
-<h1>Edit Post!
-
-<div ##{entryStatusId}>
-
-<form .form-horizontal ##{entryFormId} method=post action=@{EditEntryR} enctype=#{enctype}>
-    ^{editorWidget}
-
-    <button .btn.btn-primary type="submit">Save!

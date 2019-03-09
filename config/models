@@ -16,6 +16,7 @@ Entry
     title Text sqltype=varchar(255)
     contents Html sqltype=longtext
     posted UTCTime
+    edited UTCTime Maybe default=NULL
 Comment json
     entry EntryId
     posted UTCTime

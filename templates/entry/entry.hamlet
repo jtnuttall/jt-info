@@ -1,10 +1,26 @@
 <div .row>
-    <h2>
-        $if linkToEntry
-            <a href="@{EntryR entryId}">
-                #{entryTitle}
-        $else
-            #{entryTitle}
-<div .row>#{preEscapedToHtml entryContents}
-<div .float-right>#{formatTime defaultTimeLocale "%R — %A, %B %Y" entryPosted}
+  <div .col-md-12 .entry>
+    <div .title>
+      <h1 .text-info>
+          $if linkToEntry
+              <a href="@{EntryR entryId}">
+                  #{entryTitle}
+          $else
+              #{entryTitle}
+    <hr .post-ruler>
+
+    <div>#{entryContents}
+
+    <hr .post-ruler>
+    <div .row>
+      <div .col-md-6>
+        $if loggedIn
+          <a href="@{EditEntryR entryId}" .btn .btn-primary>Edit
+          <a href="@{DeleteEntryR entryId}" .btn .btn-primary>Delete
+      <div .col-md-6>
+        <p align="right">
+          $maybe editedTime <- entryEdited
+            Edited @ #{formatTime defaultTimeLocale "%I:%M %P — %A, %B %Y" editedTime}
+          $nothing
+            Posted @ #{formatTime defaultTimeLocale "%I:%M %P — %A, %B %Y" entryPosted}
 <hr>
